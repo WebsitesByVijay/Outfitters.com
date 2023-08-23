@@ -1,0 +1,23 @@
+
+<script>
+  const copyButton = document.getElementById('buyNow');
+  const sourceDiv = document.getElementById('yourCart');
+  const closeCartButton = document.getElementById('close-cart');
+  
+  copyButton.addEventListener('click', function() {
+    // Retrieve the HTML content of the div
+    const htmlContent = sourceDiv.innerHTML;
+    
+    // Store the HTML content in local storage
+    localStorage.setItem('copiedContent', htmlContent);
+    
+    // Navigate to the destination page
+    window.location.href = 'confirmOrders.php';
+  });
+
+  closeCartButton.addEventListener('click', function() {
+    // Hide the cart
+    const cart = document.querySelector('.cart');
+    cart.classList.remove('active');
+  });
+</script>

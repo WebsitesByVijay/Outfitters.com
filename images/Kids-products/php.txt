@@ -1,0 +1,64 @@
+<?php
+// Establish connection to your database (replace with your actual connection details)
+$server = "localhost";
+$userEmail = "root";
+$userPassword = "";
+$database = "db_connect";
+$conn = mysqli_connect($server, $userEmail, $userPassword, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch the cart data from the database
+$sql = "SELECT * FROM cart_table";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Display the cart data
+    echo "<div class='cart'>";
+    echo "<h2 class='cart-title'>Your Cart</h2>";
+    echo "<div class='cart-content'>";
+    $total = 0; // Initialize the total amount
+
+    while ($row = $result->fetch_assoc()) {
+        $cartData = $row['cart_data'];
+        $cartItems = json_decode($cartData, true);
+
+        if ($cartItems !== null) {
+            foreach ($cartItems as $item) {
+                $title = $item['title'];
+                $price = floatval($item['price']); // Convert price to float
+                $productImg = $item['productImg'];
+                $quantity = intval($item['quantity']); // Convert quantity to integer
+
+                echo "<div class='cart-item'>";
+                echo "<img src='$productImg' class='cart-img'>";
+                echo "<div class='cart-details'>";
+                echo "<div class='cart-product-title'>$title</div>";
+                echo "<div class='cart-price'>$" . number_format($price, 2) . "</div>"; // Format price with two decimal places
+                echo "<div class='cart-quantity'>Quantity: $quantity</div>";
+
+                // Calculate the total amount for this item
+                $itemTotal = $price * $quantity;
+                echo "<div class='cart-total'>Total: $" . number_format($itemTotal, 2) . "</div>"; // Format item total with two decimal places
+                echo "</div>";
+                echo "</div>";
+
+                // Accumulate the total
+                $total += $itemTotal;
+            }
+        }
+    }
+
+    echo "</div>";
+    echo "<div class='cart-total'>Grand Total: $" . number_format($total, 2) . "</div>"; // Format total with two decimal places
+    echo "</div>";
+    echo "<link rel='stylesheet' href='display.css'>";
+} else {
+    echo "<div class='cart'>Your Cart is Empty</div>";
+}
+
+$conn->close();
+?>

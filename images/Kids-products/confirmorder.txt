@@ -1,0 +1,85 @@
+confirmorder
+<?php
+// Establish a database connection
+$server = "localhost";
+$userEmail = "root";
+$userPassword = "";
+$database = "db_connect";
+
+$conn = mysqli_connect($server, $userEmail, $userPassword, $database);
+
+// Check the connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Retrieve the data from the destinationDiv
+    $copiedContent = isset($_POST['order_details']) ? mysqli_real_escape_string($conn, $_POST['order_details']) : '';
+    $price = isset($_POST['product_price']) ? mysqli_real_escape_string($conn, $_POST['product_price']) : '';
+
+    // Insert the HTML content into the database
+    $sql = "INSERT INTO orders (copiedContent, price) VALUES ('$copiedContent', '$price')";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "Record inserted successfully.";
+     header("location: order.php");
+    } else {
+        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    }
+}
+
+// Close the database connection
+mysqli_close($conn);
+?>
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title>Destination Page</title>
+    <!-- CSS link -->
+    <link rel="stylesheet" href="confirmOrders.css">
+</head>
+
+<body>
+    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+        <div id="destinationDiv">
+            <!-- Content will be inserted here -->
+        </div>
+
+        <input type="hidden" name="order_details" id="order_details_input">
+        <input type="hidden" name="product_price" id="product_price_input">
+
+        <button class="confirm-button" type="submit">CONFIRM</button>
+
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const destinationDiv = document.getElementById('destinationDiv');
+            const orderDetailsInput = document.getElementById('order_details_input');
+            const productPriceInput = document.getElementById('product_price_input');
+
+            // Retrieve the stored HTML content from local storage
+            const copiedContent = localStorage.getItem('copiedContent');
+            const price = localStorage.getItem('price');
+
+            // Insert the copied content and price into the destination div
+            destinationDiv.innerHTML = copiedContent + '<br>' + price;
+
+            // Set the values of the hidden inputs
+            orderDetailsInput.value = copiedContent;
+            productPriceInput.value = price;
+
+            // Clear the stored content from local storage (optional)
+            localStorage.removeItem('copiedContent');
+            localStorage.removeItem('price');
+        });
+        </script>
+    </form>
+</body>
+
+</html>
